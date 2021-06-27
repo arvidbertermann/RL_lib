@@ -19,6 +19,7 @@ class KDBDataProvider():
         self.date = date
         q = qpython.qconnection.QConnection('localhost', port, pandas=True)
         q.open()
+
         q("\\l " + path)
         
         if use_bbo:
