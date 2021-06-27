@@ -2,6 +2,7 @@ from collections import deque
 import pandas as pd
 import numpy as np
 
+
 class QAgent():
 
     def __init__(self, syms, config):
