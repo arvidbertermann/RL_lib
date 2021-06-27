@@ -7,7 +7,7 @@ from bokeh.models import WheelZoomTool
 from bokeh.models import BoxZoomTool
 from bokeh.models import ResetTool
 from bokeh.models import ColumnDataSource
-from plots.bokeh import *
+from simulation_framework.plots.bokeh import *
 import numpy as np
 from scipy.stats.kde import gaussian_kde
 from bokeh.models import Slider

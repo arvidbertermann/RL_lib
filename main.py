@@ -1,8 +1,8 @@
 #bokeh serve --show PycharmProjects/RL_lib/main.py
 
-from plots.bokeh import *
-from plots.bokeh_inventory import *
-from functions import *
+from simulation_framework.plots.bokeh import *
+from simulation_framework.plots.bokeh_inventory import *
+from simulation_framework.functions import *
 import numpy as np
 from bokeh.io import curdoc
 from bokeh.models.widgets import Tabs, Panel

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sim_data.ou import *
+from simulation_framework.sim_data.ou import *
 
 
 def bollinger_strategy(theta, mu, sigma, ts, num_iter=500):
