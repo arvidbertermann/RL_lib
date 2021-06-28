@@ -144,3 +144,6 @@ class QAgent():
     def append_pnl_and_reset(self):
         self.pnls.append(self.pnl)
         self.cash = 0
+
+    def get_exp(self):
+        return self.__cur_exp

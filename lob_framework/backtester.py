@@ -54,14 +54,16 @@ class Backtester():
         state, _ = self.agent.determine_next_state_and_reward(first_state, "n", signal[0], signal[1])
         episode = 1
 
-        stop = df.index().values[-1]
-        time = df.index().values
+        stop = df.index[-1]
+        time = df.index
         i = 0
         while time[i] < stop:
             action = self.agent.act(state)
-            next_state, reward = self.agent.determine_next_state_and_reward(state, action, signal[i], signal[i + 1])
+            next_state, _ = self.agent.determine_next_state_and_reward(state, action, signal[i], signal[i + 1])
             self.agent.update_signal_pnl(state, action, signal[i], signal[i + 1])
-            reward = self.execution.execute_order(time[i], action)
+            exp = self.agent.get_exp()
+            reward, price, next_price = self.execution.execute_order(time[i], exp)
+            self.execution.update_pnl(state, action, price, next_price)
             self.agent.update(state, action, reward, next_state)
 
             if i % self._update_eps == 0:
@@ -70,6 +72,7 @@ class Backtester():
                     print("Episode " + str(episode) + ": " + str(self.agent.pnl))
                     episode += 1
                     self.agent.append_pnl_and_reset()
+                    self.execution.append_pnl_and_reset()
 
             state = next_state
             i += 1
