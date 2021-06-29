@@ -9,11 +9,12 @@ class MPExecution():
         self.delay = dt.timedelta(microseconds=delay)
         self.output_dict = dict(mid_price=[], ex_price=[], time=[])
         self.cash = 0
+        self.pnl = 0
         self.pnls = []
 
     def execute_order(self, time, exp):
         obs = self.lob[self.lob["exch_time"] == time].iloc[-1,:]
-        mid =  obs["a_px_0"] + obs["b_px_0"]
+        mid = obs["a_px_0"] + obs["b_px_0"]
         temp = self.lob[self.lob["exch_time"] > time + self.delay]
         next_obs = temp.iloc[0,:]
         next_mid = next_obs["a_px_0"] + next_obs["b_px_0"]
@@ -31,10 +32,21 @@ class MPExecution():
             self.pnl = self.cash + x_2
         else:
             if int(state) < 0:
-                self.pnl = self.cash - x_2 + x_1
+                self.pnl = self.pnl - x_2 + x_1
             else:
-                self.pnl = self.cash + x_2 - x_1
+                self.pnl = self.pnl + x_2 - x_1
 
-    def append_pnl_and_reset(self):
+    def first_pnl(self, exp, x_1, x_2):
+        if exp == "s":
+            self.cash += x_1
+            #self.pnl = self.cash - x_2
+        else:
+            self.cash -= x_1
+            #self.pnl = self.cash + x_2
+
+    def append_pnl(self, exp, x_2):
+        #if exp == "b":
+        #    self.pnl += x_2
+        #else:
+        #    self.pnl -= x_2
         self.pnls.append(self.pnl)
-        self.cash = 0

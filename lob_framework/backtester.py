@@ -49,33 +49,41 @@ class Backtester():
     def run(self, q_learning=False):
         df, features = self.__prepare_inputs()
         signal = features["feature_1"]
+        stop = df.index[-1]
+        time = df.index
 
         first_state = self.agent.prepare_start(signal)
         state, _ = self.agent.determine_next_state_and_reward(first_state, "n", signal[0], signal[1])
-        episode = 1
+        self.agent.first_pnl(signal[0], signal[1])
+        exp = self.agent.get_exp()
+        _, price, next_price = self.execution.execute_order(time[0], exp)
+        self.execution.first_pnl(exp, price, next_price)
 
-        stop = df.index[-1]
-        time = df.index
-        i = 0
+        episode = 1
+        i = 1
         while time[i] < stop:
             action = self.agent.act(state)
             next_state, _ = self.agent.determine_next_state_and_reward(state, action, signal[i], signal[i + 1])
             self.agent.update_signal_pnl(state, action, signal[i], signal[i + 1])
+
+
             exp = self.agent.get_exp()
             reward, price, next_price = self.execution.execute_order(time[i], exp)
             self.execution.update_pnl(state, action, price, next_price)
+
+
             self.agent.update(state, action, reward, next_state)
 
+            i += 1
             if i % self._update_eps == 0:
                 self.agent.update_eps()
                 if i % self._next_episode == 0:
-                    print("Episode " + str(episode) + ": " + str(self.agent.pnl))
+                    self.agent.append_pnl()
+                    self.execution.append_pnl(exp, next_price)
+                    print("Episode " + str(episode) + ": " + str(self.execution.pnls[-1]))
                     episode += 1
-                    self.agent.append_pnl_and_reset()
-                    self.execution.append_pnl_and_reset()
-
             state = next_state
-            i += 1
+
 
         self.agent.to_df()
         output_dict = dict(scores=self.agent.pnls, data=self.agent.data)

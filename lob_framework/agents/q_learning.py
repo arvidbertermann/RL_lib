@@ -30,6 +30,7 @@ class QAgent():
         self.__cur_exp = np.random.choice(["b", "s"])
 
         if self.__cur_exp == "b":
+
             return "44"
         else:
             return "-44"
@@ -137,13 +138,20 @@ class QAgent():
             self.pnl = self.cash + x_2
         else:
             if int(state) < 0:
-                self.pnl = self.cash - x_2 + x_1
+                self.pnl = self.pnl - x_2 + x_1
             else:
-                self.pnl = self.cash + x_2 - x_1
+                self.pnl = self.pnl + x_2 - x_1
 
-    def append_pnl_and_reset(self):
+    def first_pnl(self, x_1, x_2):
+        if self.__cur_exp == "s":
+            self.cash += x_1
+            #self.pnl = self.cash - x_2
+        else:
+            self.cash -= x_1
+            #self.pnl = self.cash + x_2
+
+    def append_pnl(self):
         self.pnls.append(self.pnl)
-        self.cash = 0
 
     def get_exp(self):
         return self.__cur_exp
