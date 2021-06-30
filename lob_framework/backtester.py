@@ -50,39 +50,35 @@ class Backtester():
         df, features = self.__prepare_inputs()
         signal = features["feature_1"]
         stop = df.index[-1]
+        next_time = df.index[0]
         time = df.index
 
         first_state = self.agent.prepare_start(signal)
         state, _ = self.agent.determine_next_state_and_reward(first_state, "n", signal[0], signal[1])
         self.agent.first_pnl(signal[0], signal[1])
         exp = self.agent.get_exp()
-        _, price, next_price = self.execution.execute_order(time[0], exp)
+        _, price, next_price, _ = self.execution.execute_order(time[0], exp)
         self.execution.first_pnl(exp, price, next_price)
 
         episode = 1
         i = 1
         while time[i] < stop:
-            action = self.agent.act(state)
-            next_state, _ = self.agent.determine_next_state_and_reward(state, action, signal[i], signal[i + 1])
-            self.agent.update_signal_pnl(state, action, signal[i], signal[i + 1])
+            if next_time <= time[i]:
+                action = self.agent.act(state)
+                next_state, _ = self.agent.determine_next_state_and_reward(state, action, signal[i], signal[i + 1])
+                self.agent.update_signal_pnl(state, action, signal[i], signal[i + 1])
+                exp = self.agent.get_exp()
+                reward, price, next_price, next_time = self.execution.execute_order(time[i], exp)
+                self.execution.update_pnl(state, action, price, next_price)
+                self.agent.update(state, action, reward, next_state)
 
-
-            exp = self.agent.get_exp()
-            reward, price, next_price = self.execution.execute_order(time[i], exp)
-            self.execution.update_pnl(state, action, price, next_price)
-
-
-            self.agent.update(state, action, reward, next_state)
-
-            i += 1
-            if i % self._update_eps == 0:
-                self.agent.update_eps()
-                if i % self._next_episode == 0:
-                    self.agent.append_pnl()
-                    self.execution.append_pnl(exp, next_price)
-                    print("Episode " + str(episode) + ": " + str(self.execution.pnls[-1]))
-                    episode += 1
-            state = next_state
+                i += 1
+                episode = self.check_episode(i, episode)
+                state = next_state
+            else:
+                self.agent.append_memory(signal[i])
+                i += 1
+                episode = self.check_episode(i, episode)
 
 
         self.agent.to_df()
@@ -92,6 +88,16 @@ class Backtester():
 
         return output_dict
 
+    def check_episode(self, i, episode):
+        if i % self._update_eps == 0:
+            self.agent.update_eps()
+            if i % self._next_episode == 0:
+                print("Investments: " + str(self.agent.count_changes))
+                self.agent.append_pnl()
+                self.execution.append_pnl()
+                print("Episode " + str(episode) + ": " + str(self.execution.pnls[-1]))
+                episode += 1
+        return episode
 if __name__ == '__main__':
 
     kdb_data_path = r'C:\Users\arvid\kdb_bmll_v1.0_snapshot'
@@ -116,8 +122,10 @@ if __name__ == '__main__':
         memory_length=1000,
         buckets=7)
 
+
+    delay= 5_000
     agent = QAgent(sym, q_config_1)
-    execution = MPExecution(dp.data)
+    execution = MPExecution(dp.data, delay=delay)
     backtester = Backtester(agent, execution)
     output_dict = backtester.run()
     filename = str(date_str) + "_" + str(sym) + ".pickle"

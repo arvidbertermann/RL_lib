@@ -21,6 +21,7 @@ class QAgent():
         self.cash = 0
         self.pnl = 0
         self.pnls = []
+        self.count_changes = 0
 
     def prepare_start(self, signal):
         for j in range(len(signal)):
@@ -72,6 +73,7 @@ class QAgent():
         self.__memory.append(x_1)
         self.save_data(state, action, x_1)
         if action != "n":
+            self.count_changes += 1
             second_digit = state[-2]
             self.__cur_exp = action
         else:
@@ -152,6 +154,7 @@ class QAgent():
 
     def append_pnl(self):
         self.pnls.append(self.pnl)
+        self.count_changes = 0
 
     def get_exp(self):
         return self.__cur_exp

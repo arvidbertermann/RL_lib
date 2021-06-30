@@ -20,8 +20,8 @@ class MPExecution():
         next_mid = next_obs["a_px_0"] + next_obs["b_px_0"]
         reward = (next_mid - mid)/2
         if exp == "b":
-            return reward, mid, next_mid
-        return -1*reward, mid, next_mid
+            return reward, mid, next_mid, next_obs["exch_time"]
+        return -1*reward, mid, next_mid, next_obs["exch_time"]
 
     def update_pnl(self, state, action, x_1, x_2):
         if action == "s":
@@ -44,9 +44,5 @@ class MPExecution():
             self.cash -= x_1
             #self.pnl = self.cash + x_2
 
-    def append_pnl(self, exp, x_2):
-        #if exp == "b":
-        #    self.pnl += x_2
-        #else:
-        #    self.pnl -= x_2
+    def append_pnl(self):
         self.pnls.append(self.pnl)
