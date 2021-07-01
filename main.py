@@ -37,10 +37,10 @@ path = os.getcwd()
 """
 Simple one_agents - no inventory!
 """
-#filename = path + '\PycharmProjects\RL_lib\data\q_learning\q_learning_output.pickle'
+filename = path + '\PycharmProjects\RL_lib\data\q_learning\q_learning_output1.pickle'
 #filename = path + '\PycharmProjects\RL_lib\data\dqn\dqn_output.pickle'
 #filename = path + '\PycharmProjects\RL_lib\data\interactive_dqn\interactive_dqn_output.pickle'
-filename = path + r'\PycharmProjects\RL_lib\data\backtester\_2021.02.19_BBG00BFJSR16.pickle'
+#filename = path + r'\PycharmProjects\RL_lib\data\backtester\_2021.02.19_BBG00BFJSR16.pickle'
 page = bokeh_page_simple(filename, bollinger, q_learning=False)
 
 """

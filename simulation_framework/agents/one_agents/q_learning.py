@@ -1,4 +1,4 @@
-from sim_data.ou import *
+from simulation_framework.sim_data.ou import *
 from collections import deque
 import pandas as pd
 import numpy as np
@@ -78,6 +78,7 @@ def q_learning_agent(q_tabular, theta, mu, sigma, ts, alpha, gamma, n_episodes,
         first_digit = 4
         second_digit = 4
         cash = 0.
+        pnl = .0
         cashs = [cash]
         pnls = [cash]
         position = 0
@@ -150,9 +151,9 @@ def q_learning_agent(q_tabular, theta, mu, sigma, ts, alpha, gamma, n_episodes,
                 pnl = cash + Xs[i + 1]
             else:
                 if cur_exp == "s":
-                    pnl = cash - Xs[i + 1] + Xs[i]
+                    pnl = pnl - Xs[i + 1] + Xs[i] #mistake
                 elif cur_exp == "b":
-                    pnl = cash + Xs[i + 1] - Xs[i]
+                    pnl = pnl + Xs[i + 1] - Xs[i] #mistake
                 else:
                     print("Unknown exposure")
 
@@ -221,9 +222,9 @@ if __name__ == '__main__':
                                    epsilon, epsilon_decay, barriers, memory_len)
 
     path_parent = os.path.dirname(os.getcwd())
-    path_grandparent = os.path.dirname(path_parent)
+    path_grandparent = os.path.dirname(os.path.dirname(path_parent))
     """Save data"""
-    filename = path_grandparent + '\data\q_learning\q_learning_output_final00.pickle'
+    filename = path_grandparent + '\data\q_learning\q_learning_output1.pickle'
     with open(filename, 'wb') as handle:
         pickle.dump(output_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
