@@ -224,7 +224,7 @@ if __name__ == '__main__':
     path_parent = os.path.dirname(os.getcwd())
     path_grandparent = os.path.dirname(os.path.dirname(path_parent))
     """Save data"""
-    filename = path_grandparent + '\data\q_learning\q_learning_output1.pickle'
+    filename = path_grandparent + '\data_new\q_learning\q_learning_output.pickle'
     with open(filename, 'wb') as handle:
         pickle.dump(output_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 

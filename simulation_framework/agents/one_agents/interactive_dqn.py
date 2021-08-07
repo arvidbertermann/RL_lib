@@ -2,7 +2,7 @@ import pandas as pd
 from keras.layers import Dense
 from keras.models import Sequential
 from keras.optimizers import Adam
-from sim_data.ou import *
+from simulation_framework.sim_data.ou import *
 import os
 import pickle
 from collections import deque
@@ -131,6 +131,7 @@ def interactive_dqn_learning(theta, mu, sigma, ts, n_episodes):
         state = (Xs[0], last_switch, cur_exp)
         state = np.reshape(state, (1, state_size))
         cash = 0.
+        pnl = .0
         cashs = [cash]
         pnls = [cash]
         position = 0
@@ -166,9 +167,9 @@ def interactive_dqn_learning(theta, mu, sigma, ts, n_episodes):
                 pnl = cash + Xs[i + 1]
             else:
                 if cur_exp == -1:
-                    pnl = cash - Xs[i + 1] + Xs[i]
+                    pnl = pnl - Xs[i + 1] + Xs[i]
                 elif cur_exp == 1:
-                    pnl = cash + Xs[i + 1] - Xs[i]
+                    pnl = pnl + Xs[i + 1] - Xs[i]
                 else:
                     pnl = -1000
                     print("Unknown exposure")
@@ -220,8 +221,8 @@ if __name__ == '__main__':
     output_dict = interactive_dqn_learning(theta, mu, sigma, ts, n_episodes)
 
     path_parent = os.path.dirname(os.getcwd())
-    path_grandparent = os.path.dirname(path_parent)
+    path_grandparent = os.path.dirname(os.path.dirname(path_parent))
     """Save data"""
-    filename = path_grandparent + '\data\interactive_dqn\interactive_dqn_output_final.pickle'
+    filename = path_grandparent + '\data_new\interactive_dqn\interactive_dqn_output.pickle'
     with open(filename, 'wb') as handle:
         pickle.dump(output_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
